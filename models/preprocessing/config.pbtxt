@@ -1,0 +1,56 @@
+# config.pbtxt
+name: "preprocessing"                                                  
+backend: "python"                                          
+                                                        
+input [                                                                  
+  {                                                                      
+    name: "input_image"                                                       
+    data_type: TYPE_STRING                                               
+    dims: [ 1 ]                                                          
+  }                                                                      
+]                                                                        
+
+output [                                                                 
+  {                                                                      
+    name: "padded_image"                                                      
+    data_type: TYPE_FP32                                               
+    dims: [1, 3, 1280, 1280]                                                        
+  },
+  {                                                                      
+    name: "ratio"                                                      
+    data_type: TYPE_FP32                                               
+    dims: [2]                                                        
+  },
+  {                                                                      
+    name: "dla_input"                                                      
+    data_type: TYPE_UINT8                                              
+    dims: [3, 1000, 1000]                                                        
+  },
+  {                                                                      
+    name: "ratio_dla"                                                      
+    data_type: TYPE_FP32                                               
+    dims: [2]                                                        
+  },
+  {                                                                      
+    name: "height"                                                      
+    data_type: TYPE_FP32                                               
+    dims: [1]                                                        
+  },
+  {                                                                      
+    name: "width"                                                      
+    data_type: TYPE_FP32                                               
+    dims: [1]                                                        
+  }                                 
+
+]        
+
+parameters: {
+    key: "EXECUTION_ENV_PATH", 
+    value: {string_value: "$$TRITON_MODEL_DIRECTORY/triton.tar.gz"}
+}
+
+instance_group [
+    {
+        kind: KIND_CPU
+    }
+]

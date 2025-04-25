@@ -1,0 +1,367 @@
+name: "ensemble" 
+platform: "ensemble" 
+
+input [
+    {
+        name: "input_image",
+        data_type: TYPE_STRING,
+        dims: [1]
+    }
+]
+
+output [
+    {
+        name: "final_texts_with_line",
+        data_type: TYPE_STRING ,                                                    
+        dims: [-1,6]     
+    },
+    {
+        name: "figure_result",
+        data_type: TYPE_FP32 ,                                                    
+        dims: [-1,4]     
+    },
+    {
+        name: "final_table_bboxes",
+        data_type: TYPE_FP32 ,                                                    
+        dims: [-1,4]    
+    },
+    {
+        name: "html_tags",
+        data_type: TYPE_STRING ,                                                    
+        dims: [-1]     
+    }
+]
+
+ensemble_scheduling {
+    step [
+
+##############################################################################################################
+        {
+            model_name: "preprocessing",
+            model_version: -1,
+
+            input_map {
+                key: "input_image", 
+                value: "input_image"
+            },
+
+            output_map {
+                key: "padded_image",
+                value: "padded_image" 
+            },
+            output_map {
+                key: "ratio",
+                value: "ratio" 
+            },
+            output_map {
+                key: "dla_input",
+                value: "dla_input" 
+            },
+            output_map {
+                key: "ratio_dla",
+                value: "ratio_dla" 
+            },
+            output_map {
+                key: "height",
+                value: "height" 
+            },
+            output_map {
+                key: "width",
+                value: "width" 
+            }
+
+        },
+
+##############################################################################################################
+        {
+            model_name: "detection",
+            model_version: -1, 
+            input_map {
+                key: "images", 
+                value: "padded_image"
+            },
+
+            output_map {
+                key: "output0",
+                value: "output0" 
+            }
+        },
+##############################################################################################################
+        {
+            model_name: "dla",
+            model_version: -1, 
+            input_map {
+                key: "image", 
+                value: "dla_input"
+            },
+
+            output_map {
+                key: "pred_box",
+                value: "pred_box" 
+            },
+
+            output_map {
+                key: "pred_class",
+                value: "pred_class" 
+            }
+        },
+
+##############################################################################################################
+
+        {
+            model_name: "midprocessing",
+            model_version: -1, 
+            input_map {
+                key: "detection_result", 
+                value: "output0"
+            },
+            input_map {
+                key: "padded_image", 
+                value: "padded_image"
+            },
+            input_map {
+                key: "raw_image", 
+                value: "input_image"
+            },
+            input_map {
+                key: "ratio", 
+                value: "ratio"
+            },
+
+            output_map {
+                key: "bboxes",
+                value: "bboxes" 
+            },
+
+            output_map {
+                key: "cropped_images",
+                value: "cropped_images" 
+            },
+
+            output_map {
+                key: "recognition_flag",
+                value: "recognition_flag" 
+            }
+        },
+
+##############################################################################################################
+        {
+            model_name: "recognition",
+            model_version: -1, 
+            input_map {
+                key: "input", 
+                value: "cropped_images"
+            },
+            output_map {
+                key: "output",
+                value: "output" 
+            }
+        },
+
+##############################################################################################################
+        {
+            model_name: "postprocessing1",
+            model_version: -1, 
+            input_map {
+                key: "recognition_flag_pp", 
+                value: "recognition_flag"
+            },
+            input_map {
+                key: "recognition_result", 
+                value: "output"
+            },
+            input_map {
+                key: "bboxes",
+                value: "bboxes" 
+            },
+            input_map {
+                key: "raw_image", 
+                value: "input_image"
+            },
+
+            input_map {
+                key: "pred_box",
+                value: "pred_box" 
+            },
+
+            input_map {
+                key: "pred_class", 
+                value: "pred_class"
+            },
+            input_map {
+                key: "ratio_dla", 
+                value: "ratio_dla"
+            },
+            output_map {
+                key: "text_result",
+                value: "text_result" 
+            },
+            output_map {
+                key: "table_result",
+                value: "table_result" 
+            },
+            output_map {
+                key: "figure_result",
+                value: "figure_result" 
+            },
+            output_map {
+                key: "table_flag",
+                value: "table_flag" 
+            }
+        },
+##############################################################################################################
+        {
+            model_name: "postprocessing2",
+            model_version: -1, 
+            
+            input_map {
+                key: "table_bbox", 
+                value: "table_result"
+            },
+
+            input_map {
+                key: "raw_input_image", 
+                value: "input_image"
+            },
+            input_map {
+                key: "table_execute_signal",
+                value: "table_flag"  
+            }
+
+            output_map {
+                key: "preprocessed_table",
+                value: "preprocessed_table"  
+            },
+
+            output_map {
+                key: "nw",
+                value: "nw"  
+            },
+            output_map {
+                key: "nh",
+                value: "nh"  
+            },
+            output_map {
+                key: "oriw",
+                value: "oriw"  
+            },
+            output_map {
+                key: "orih",
+                value: "orih"  
+            }
+
+        },
+##############################################################################################################
+        {
+            model_name: "tr_model",
+            model_version: -1, 
+            
+            input_map {
+                key: "tr_input", 
+                value: "preprocessed_table"
+            },
+            output_map {
+                key: "tr_output1",
+                value: "tr_output1"  
+            },
+            output_map {
+                key: "tr_output2",
+                value: "tr_output2"  
+            }
+        },
+##############################################################################################################
+        {
+            model_name: "postprocessing3",
+            model_version: -1,
+
+            input_map {
+                key: "recognition_flag_pp3", 
+                value: "recognition_flag"
+            },
+            
+            input_map {
+                key: "tr_model_output1", 
+                value: "tr_output1"
+            },
+
+            input_map {
+                key: "tr_model_output2",
+                value: "tr_output2" 
+            },
+
+            input_map {
+                key: "texts",
+                value: "text_result" 
+            },
+
+            input_map {
+                key: "table_bbox_results",
+                value: "table_result" 
+            },
+
+
+            input_map {
+                key: "nh_pp",
+                value: "nh" 
+            },
+
+            input_map {
+                key: "nw_pp",
+                value: "nw" 
+            },
+
+            input_map {
+                key: "orih_pp",
+                value: "orih" 
+            },
+
+            input_map {
+                key: "oriw_pp",
+                value: "oriw" 
+            },
+
+            input_map {
+                key: "table_execute_signal_pp",
+                value: "table_flag" 
+            },
+
+            output_map {
+                key: "html_tags",
+                value: "html_tags" 
+            },
+
+            output_map {
+                key: "final_table_bboxes",
+                value: "final_table_bboxes" 
+            },
+            output_map {
+                key: "final_texts",
+                value: "final_texts" 
+            }
+        },
+##############################################################################################################
+        {
+            model_name: "line_sorting",
+            model_version: -1, 
+            
+            input_map {
+                key: "final_texts_wo_line", 
+                value: "final_texts"
+            },
+            input_map {
+                key: "image_height",
+                value: "height"  
+            },
+            input_map {
+                key: "image_width",
+                value: "width"  
+            },
+
+            output_map {
+                key: "final_texts_with_line",
+                value: "final_texts_with_line"  
+            }
+        }
+
+    ]
+}

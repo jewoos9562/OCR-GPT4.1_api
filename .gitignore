@@ -1,0 +1,11 @@
+*.tar.gz
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.xlsx
+__pycache__/
+.env
+*.db
+*.log
+*.onnx

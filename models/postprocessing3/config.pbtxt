@@ -1,0 +1,85 @@
+# config.pbtxt
+name: "postprocessing3"                                                  
+backend: "python"                                          
+                                                        
+input [                                                                  
+  {                                                                      
+    name: "tr_model_output1"                                                       
+    data_type: TYPE_FP32
+    dims: [-1,-1,43]                                                      
+  },
+  {                                                                      
+    name: "recognition_flag_pp3"                                                       
+    data_type: TYPE_FP32
+    dims: [1]                                                      
+  },
+  {                                                                      
+    name: "tr_model_output2"                                                       
+    data_type: TYPE_FP32
+    dims: [-1,-1,4]                                                      
+  },
+  {                                                                      
+    name: "texts"                                                       
+    data_type: TYPE_STRING
+    dims: [-1,5]                                                      
+  },
+  {                                                                      
+    name: "table_bbox_results"                                                       
+    data_type: TYPE_FP32
+    dims: [-1,4]                                                      
+  },
+  {                                                                      
+    name: "nw_pp"                                                      
+    data_type: TYPE_FP32                                              
+    dims: [-1]                                                        
+  },
+  {                                                                      
+    name: "nh_pp"                                                      
+    data_type: TYPE_FP32                                               
+    dims: [-1]                                                        
+  },
+  {                                                                      
+    name: "oriw_pp"                                                      
+    data_type: TYPE_FP32                                              
+    dims: [-1]                                                        
+  },
+  {                                                                      
+    name: "orih_pp"                                                      
+    data_type: TYPE_FP32                                             
+    dims: [-1]                                                      
+  },
+  {                                                                      
+    name: "table_execute_signal_pp"                                                      
+    data_type: TYPE_FP32                                             
+    dims: [1]                                                      
+  }    
+]                                                                        
+
+output [                                                                 
+    {                                                                      
+      name: "html_tags"                                                      
+      data_type: TYPE_STRING                                               
+      dims: [-1]                                                        
+    },
+    {                                                                      
+      name: "final_table_bboxes"                                                      
+      data_type: TYPE_FP32                                               
+      dims: [-1,4]                                                        
+    },
+    {                                                                      
+    name: "final_texts"                                                       
+    data_type: TYPE_STRING
+    dims: [-1,5]                                                      
+    }             
+]        
+
+parameters: {
+    key: "EXECUTION_ENV_PATH", 
+    value: {string_value: "/models/240117_env.tar.gz"}
+}
+
+instance_group [
+    {
+        kind: KIND_CPU
+    }
+]

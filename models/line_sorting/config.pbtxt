@@ -1,0 +1,42 @@
+# config.pbtxt
+name: "line_sorting"                                                  
+backend: "python"                                          
+                                                        
+input [                                                                  
+  {                                                                      
+    name: "final_texts_wo_line"                                                       
+    data_type: TYPE_STRING
+    dims: [-1,5]                                                      
+  },
+  {                                                                      
+    name: "image_height"                                                       
+    data_type: TYPE_FP32
+    dims: [1]                                                      
+  },
+  {                                                                      
+    name: "image_width"                                                       
+    data_type: TYPE_FP32
+    dims: [1]                                                      
+  }
+   
+
+]                                                                        
+
+output [                                                                 
+  {                                                                      
+    name: "final_texts_with_line"                                                       
+    data_type: TYPE_STRING
+    dims: [-1,6]                                                      
+  }                                 
+]    
+
+parameters: {
+    key: "EXECUTION_ENV_PATH", 
+    value: {string_value: "/models/240117_env.tar.gz"}
+}
+
+instance_group [
+    {
+        kind: KIND_CPU
+    }
+]
