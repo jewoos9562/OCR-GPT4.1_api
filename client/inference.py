@@ -8,7 +8,7 @@ import re
 # ==== 설정 ====
 TRITON_URL = "localhost:8000"
 MODEL_NAME = "ensemble"
-input_image_path = "/workspace/sample_image2/insure/images/insure_00004.jpeg"
+input_image_path = "/workspace/ocr/openai/sample_images/bank_00002.jpg"
 save_folder = "/workspace/result"
 os.makedirs(save_folder, exist_ok=True)
 save_path = os.path.join(save_folder, "document_result.jpg")

@@ -14,7 +14,7 @@ def image_to_base64(image_path):
         return base64.b64encode(f.read()).decode('utf-8')
 
 # === 입력 이미지 경로 ===
-image_path = "/workspace/sample_image2/insure/images/insure_00004.jpeg"
+image_path = "/workspace/ocr/openai/sample_images/bank_00002.jpg"
 image_base64 = image_to_base64(image_path)
 save_folder = "/workspace/result"
 prompt = f"""
